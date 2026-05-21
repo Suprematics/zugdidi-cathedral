@@ -1545,8 +1545,8 @@
       document.documentElement.lang = lang === 'ka' ? 'ka' : lang === 'ru' ? 'ru' : 'en';
     }
 
-    // init
-    setLang('ka');
+    // init — use language from URL hash if present
+    setLang(currentLang);
 
     // ── SCROLL ANIMATION ───────────────────────────────────────
     const observer = new IntersectionObserver((entries) => {
