@@ -1521,7 +1521,9 @@
   ════════════════════════════════════════════════════════════ -->
   <script>
     // ── LANGUAGE SWITCHER ──────────────────────────────────────
-    let currentLang = 'ka';
+    // Support URL hash: #ru, #en, #ka
+    const hashLang = window.location.hash.replace('#', '');
+    let currentLang = ['ka', 'ru', 'en'].includes(hashLang) ? hashLang : 'ka';
 
     function setLang(lang) {
       currentLang = lang;
