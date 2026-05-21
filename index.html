@@ -711,7 +711,25 @@
       .step-number { display: none; }
       .lang-bar { padding: 12px 16px; }
     }
+
+    /* ─── INSTANT LANG SWITCH (no flash) ────────────────────── */
+    /* set by head script before content renders */
+    html[data-lang="ru"] .lang-ka,
+    html[data-lang="ru"] .lang-en,
+    html[data-lang="en"] .lang-ka,
+    html[data-lang="en"] .lang-ru { display: none !important; }
+    html[data-lang="ru"] .lang-ru,
+    html[data-lang="en"] .lang-en  { display: revert !important; }
   </style>
+
+  <script>
+    (function () {
+      var p = new URLSearchParams(location.search).get('lang');
+      var h = location.hash.slice(1);
+      var l = ['ru', 'en'].indexOf(p) >= 0 ? p : (['ru', 'en'].indexOf(h) >= 0 ? h : '');
+      if (l) document.documentElement.setAttribute('data-lang', l);
+    })();
+  </script>
 </head>
 <body>
 
@@ -1521,9 +1539,12 @@
   ════════════════════════════════════════════════════════════ -->
   <script>
     // ── LANGUAGE SWITCHER ──────────────────────────────────────
-    // Support URL hash: #ru, #en, #ka
-    const hashLang = window.location.hash.replace('#', '');
-    let currentLang = ['ka', 'ru', 'en'].includes(hashLang) ? hashLang : 'ka';
+    // Support ?lang=ru (query param) or #ru (hash) for shareable links
+    const _params = new URLSearchParams(window.location.search);
+    const _paramLang = _params.get('lang');
+    const _hashLang = window.location.hash.replace('#', '');
+    const _detected = _paramLang || _hashLang;
+    let currentLang = ['ka', 'ru', 'en'].includes(_detected) ? _detected : 'ka';
 
     function setLang(lang) {
       currentLang = lang;
@@ -1541,8 +1562,13 @@
         btn.classList.toggle('active', btn.dataset.lang === lang);
       });
 
-      // update html lang
-      document.documentElement.lang = lang === 'ka' ? 'ka' : lang === 'ru' ? 'ru' : 'en';
+      // update html lang + data-lang (used by CSS for instant no-flash switching)
+      document.documentElement.lang = lang;
+      if (lang === 'ka') {
+        document.documentElement.removeAttribute('data-lang');
+      } else {
+        document.documentElement.setAttribute('data-lang', lang);
+      }
     }
 
     // init — use language from URL hash if present
